@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-legacy 
+  namespace: legacy
+  labels:
+    app: myapp
+    protected: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-world
+  template:
+    metadata:
+      labels:
+        app: hello-world
+        protected: "true"
+    spec:
+      serviceAccountName: secret-sa
+      containers:
+      - name: hello-world
+        image: alpine
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do echo 'hello world'; sleep 30; done;"]
+      nodeName: Worker-3

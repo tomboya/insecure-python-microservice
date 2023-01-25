@@ -1,0 +1,47 @@
+---
+- hosts: master
+  become: yes
+  tasks:
+    - name: remove swap
+      shell: "swapoff -a"
+    - name: Check if user data script is complete
+      shell: cat /var/log/cloud-init-output.log | grep finished
+      register: userdata_status
+      ignore_errors: true
+      retries: 8
+      delay: 15
+      until: userdata_status.stdout.find("finished") != -1
+    - name: Wait for user data script to complete
+      pause:
+        seconds: 60
+      when: userdata_status.rc != 0
+    - name: Run the installation script script 
+      shell: bash /tmp/script.sh
+    - name: initialize the cluster
+      shell: kubeadm init --pod-network-cidr=10.244.0.0/16 >> cluster_initialized.txt
+      args:
+        chdir: $HOME
+        creates: cluster_initialized.txt
+    - name: create .kube directory
+      become: yes
+      become_user: ubuntu
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: 0755
+    - name: copy admin.conf to user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/ubuntu/.kube/config
+        remote_src: yes
+        owner: ubuntu
+    - name: wait for kubeadm to initialize
+      wait_for:
+        timeout: 60
+    - name: install Pod network
+      become: yes
+      become_user: ubuntu
+      shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/v0.20.2/Documentation/kube-flannel.yml >> pod_network_setup.txt
+      args:
+        chdir: $HOME
+        creates: pod_network_setup.txt

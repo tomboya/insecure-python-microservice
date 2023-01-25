@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice1
+  labels:
+    app: microservice1
+    protected: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: microservice1
+  template:
+    metadata:
+      labels:
+        app: microservice1
+        protected: "true"
+    spec:
+      serviceAccountName: admin-sa
+      containers:
+      - name: microservice1
+        image: justmorpheu5/microservice1:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SECRET_KEY
+          value: Flag_3:{Flag_ThisIsFlag_3_0645372}
+        securityContext:
+          runAsUser: 1000
+          runAsNonRoot: true
+      nodeName: Worker-1

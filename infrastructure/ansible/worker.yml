@@ -1,0 +1,164 @@
+- hosts: master
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: get join command
+      shell: kubeadm token create --print-join-command
+      register: join_command_raw
+    - name: set join command
+      set_fact:
+        join_command: "{{ join_command_raw.stdout }}"
+    - name: fetch admin.conf from master
+      fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: /tmp/config
+        flat: yes
+
+- hosts: workers
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: remove swap
+      shell: "swapoff -a"
+    - name: Check if user data script is complete on slave
+      shell: "cat /var/log/cloud-init-output.log | grep finished"
+      register: userdata_status
+      ignore_errors: true
+      retries: 8
+      delay: 10
+    - name: Run the installation script script 
+      shell: bash /tmp/script.sh
+    - name: join cluster
+      shell: "{{ hostvars['master'].join_command }} >> node_joined.txt"
+      args:
+        chdir: $HOME
+        creates: node_joined.txt
+    - name: create ubuntu .kube directory
+      file:
+        path: /home/ubuntu/.kube
+        state: directory
+    - name: create root .kube directory
+      file:
+        path: /root/.kube
+        state: directory
+    - name: copy admin.conf from fetched location to worker for ubuntu
+      copy:
+        src: /tmp/config
+        dest: /home/ubuntu/.kube/config
+        owner: ubuntu
+    - name: copy admin.conf from fetched location to worker for root
+      copy:
+        src: /tmp/config
+        dest: /root/.kube/config
+        owner: root
+    - name: Copying the deployment to workers
+      become: true 
+      copy:
+        src: /home/ubuntu/insecure-python-microservice
+        dest: /home/ubuntu/
+        owner: ubuntu
+        group: ubuntu       
+        mode: 0755
+    - name: set permission of /home/ubuntu
+      shell: "sudo chown ubuntu:ubuntu -R /home/ubuntu/"
+    - name: Get the list of pods
+      command: kubectl get pods
+      register: pods_result
+      until: pods_result.rc == 0
+      retries: 5
+      delay: 5   
+      
+- hosts: worker1
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Service account deployment
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/frontend/k8s/service-sa.yaml
+    - name: Cluster Role Deployment
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/frontend/k8s/cluster-role.yaml
+    - name: Cluster Role Binding deployment
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/frontend/k8s/cluster-role-binding.yaml
+    - name: frontend deployment
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/frontend/k8s/deployment.yaml
+    - name: frontend service
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/frontend/k8s/service.yaml
+    - name: Check kubectl get pods status
+      command: kubectl get pods
+      register: kubectl_pods_result
+      until: "'Running' in kubectl_pods_result.stdout or 'ContainerCreating' in kubectl_pods_result.stdout"
+      retries: 5
+      delay: 5
+
+- hosts: worker2
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: backend deployment
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/backend/k8s/deployment.yaml
+    - name: backend service
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/backend/k8s/service.yaml
+
+    
+- hosts: worker3
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Stop Kubelet
+      shell: sudo systemctl stop kubelet
+    - name: Edit Kubelet Authentication
+      shell: "sudo sed -i 's/enabled: false/enabled: true/g' /var/lib/kubelet/config.yaml"
+    - name: Edit Kubelet Authorization
+      shell: "sudo sed -i 's/mode: Webhook/mode: AlwaysAllow/g' /var/lib/kubelet/config.yaml && sudo systemctl start kubelet"
+    - name: Create legacy namespace
+      shell: kubectl create namespace legacy
+    - name: Deploy kubernetes dashboard
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/k8-dashboard/k8s-dashboard.yaml
+    - name: Create Secret
+      shell: kubectl create secret generic first --from-literal=flag=Flag_4:{Flag_MyFlag4_8783443} -n legacy
+    - name: Deploy secret-sa for secret-pod
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/secret-pod/secret-sa.yaml
+    - name: Deploy role for secret-pod
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/secret-pod/role.yaml
+    - name: Deploy rolebinding for secret pod
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/secret-pod/rolebinding.yaml
+    - name: Deploy hello-world secret pod
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/secret-pod/legacy-pod.yaml
+    - name: Deploy k8s sa for cve-pod
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/CVE-2021-25741/kubernetes-sa.yaml
+    - name: Deploy role for cve-pod
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/CVE-2021-25741/clusterrole.yaml
+    - name: Deploy rolebinding for cve-pod
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/CVE-2021-25741/clusterrolebinding.yaml
+    - name: Deploy cve-pod.yaml
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/CVE-2021-25741/pod.yaml
+    - name: Create secret in shared memory
+      shell: echo "flag=Flag_5:{Flag_MyFlag5_3338889}" > /dev/shm/flag.txt
+    - name: Deploy bad pod
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/bad-pod/badpod.yaml
+    - name: Deploy failed pod
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/bad-pod/deepdive-aws.yaml
+      ignore_errors: true
+    - name: Deploy DIND pod
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/worker-3/bad-pod/dnd.yaml
+      ignore_errors: true
+    - name: Deploy kyverno deploy
+      shell: kubectl create -f https://raw.githubusercontent.com/kyverno/kyverno/release-1.7/config/release/install.yaml
+      ignore_errors: true
+    - name: Deploy kyverno policies
+      shell: kubectl create -f /home/ubuntu/insecure-python-microservice/kyverno/
+      ignore_errors: true
+      
+- hosts: worker1
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Expose service via ngrok
+      shell: chmod +x /home/ubuntu/insecure-python-microservice/infrastructure/ansible/script_nginx.sh && /bin/bash /home/ubuntu/insecure-python-microservice/infrastructure/ansible/script_nginx.sh
+        
+- hosts: workers
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: post deployment cleanup
+      shell: "rm -rf /home/ubuntu/insecure-python-microservice && rm -rf /home/ubuntu/.kube" 
+      ignore_errors: true

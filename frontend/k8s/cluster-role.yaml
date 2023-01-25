@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: admin-role
+rules:
+- apiGroups: ["", "extensions", "apps"]
+  resources: ["pods", "deployments"]
+  verbs: ["create", "apply"]
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list"]
+  resourceNames:
+    - "kyverno"
+    - "gatekeeper"
+    - "kube-system"
+    - "default"
+- apiGroups: ["", "extensions", "apps"]
+  resources: ["pods", "nodes", "svc"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
