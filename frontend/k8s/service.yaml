@@ -10,7 +10,8 @@ spec:
   selector:
     app: microservice1
   ports:
-  - protocol: TCP
+  - name: http-8080
+    protocol: TCP
     port: 8080
     targetPort: 8080
     nodePort: 30001
