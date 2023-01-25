@@ -10,6 +10,7 @@ spec:
   selector:
     app: microservice2
   ports:
+    name: http-5001
   - protocol: TCP
     port: 5001
     targetPort: 5001
