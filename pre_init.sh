@@ -56,7 +56,7 @@ ssh -D 9090 -f -C -q -N -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(
 # Check if the URL is accessible
 export http_proxy=socks5://127.0.0.1:9090 
 export https_proxy=socks5://127.0.0.1:9090
-status_code=$(curl -s -o /dev/null -w "%{http_code}" http://$(terraform output private_ec2_private_ip_slave1 | tr -d '"'):8080)
+status_code=$(curl --connect-timeout 10 -s -o /dev/null -w "%{http_code}" http://$(terraform output private_ec2_private_ip_slave1 | tr -d '"'):8080)
 # Check if the status code is 200 (OK)
 if [ $status_code -eq 200 ]; then
   sleep 1;
