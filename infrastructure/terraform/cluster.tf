@@ -135,6 +135,7 @@ resource "aws_instance" "private_ec2_m" {
 
 # Create the EC2-1 instance in the private subnet
 resource "aws_instance" "private_ec2_1" {
+  count = 3
   ami = "ami-0135afc6d226a70a4"
   instance_type = "t2.medium"
   key_name = aws_key_pair.ec2_key_pair.key_name
@@ -146,47 +147,7 @@ resource "aws_instance" "private_ec2_1" {
   }
 
   tags = {
-    Name = "Worker-1-${random_string.example.result}"
-  }
-  timeouts {
-    create = "15m"
-  }
-}
-
-# Create the EC2-2 instance in the private subnet
-resource "aws_instance" "private_ec2_2" {
-  ami = "ami-0135afc6d226a70a4"
-  instance_type = "t2.medium"
-  key_name = aws_key_pair.ec2_key_pair.key_name
-  vpc_security_group_ids = [aws_security_group.private_sg.id]
-  subnet_id = aws_subnet.private_subnet.id
-  root_block_device {
-    volume_size   = "20"
-
-  }
-
-  tags = {
-   Name = "Worker-2-${random_string.example.result}"
-  }
-  timeouts {
-    create = "15m"
-  }
-}
-
-# Create the EC2-3 instance in the private subnet
-resource "aws_instance" "private_ec2_3" {
-  ami = "ami-0135afc6d226a70a4"
-  instance_type = "t2.medium"
-  key_name = aws_key_pair.ec2_key_pair.key_name
-  vpc_security_group_ids = [aws_security_group.private_sg.id]
-  subnet_id = aws_subnet.private_subnet.id
-  root_block_device {
-    volume_size   = "20"
-
-  }
-
-  tags = {
-   Name = "Worker-3-${random_string.example.result}"
+    Name = "Worker-${count.index+1}"
   }
   timeouts {
     create = "15m"
