@@ -380,8 +380,10 @@ while [ ! -f /home/ubuntu/ec2_key.pem ]; do
   sleep 5
 done
 echo "File found, continuing with script"
-aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-1*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-1/{}/g' /home/ubuntu/insecure-python-microservice/frontend/k8s/deployment.yaml
-aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-2*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-2/{}/g' /home/ubuntu/insecure-python-microservice/backend/k8s/deployment.yaml
+#aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-1*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-1/{}/g' /home/ubuntu/insecure-python-microservice/frontend/k8s/deployment.yaml
+#aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-2*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-2/{}/g' /home/ubuntu/insecure-python-microservice/backend/k8s/deployment.yaml
+aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-1*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-1/{}/g' /home/ubuntu/insecure-python-microservice/infrastructure/istio/my-app/injected.yaml
+aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-2*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-2/{}/g' /home/ubuntu/insecure-python-microservice/infrastructure/istio/my-app/injected.yaml
 aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-3*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-3/{}/g' /home/ubuntu/insecure-python-microservice/worker-3/CVE-2021-25741/pod.yaml
 aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-3*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-3/{}/g' /home/ubuntu/insecure-python-microservice/worker-3/bad-pod/badpod.yaml
 aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-3*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-3/{}/g' /home/ubuntu/insecure-python-microservice/worker-3/bad-pod/dnd.yaml
@@ -389,14 +391,14 @@ aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-3*' --query "R
 aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-3*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-3/{}/g' /home/ubuntu/insecure-python-microservice/worker-3/secret-pod/legacy-pod.yaml
 aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-1*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-1/{}/g' /home/ubuntu/insecure-python-microservice/kyverno/restrictnodeselectionworker1.yaml
 aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-2*' --query "Reservations[].Instances[].PrivateDnsName" --output text --region us-west-2 | cut -d '.' -f1 | awk '{print $1}' | xargs -I {} sed -i -e 's/Worker-2/{}/g' /home/ubuntu/insecure-python-microservice/kyverno/restrictnodeselectionworker2.yaml
-aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-1*' --query "Reservations[].Instances[].PrivateIpAddress" --output text --region us-west-2  | xargs -I {} sed -i -e 's/Worker-1/{}/g' /home/ubuntu/insecure-python-microservice/frontend/k8s/service.yaml
+#aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-1*' --query "Reservations[].Instances[].PrivateIpAddress" --output text --region us-west-2  | xargs -I {} sed -i -e 's/Worker-1/{}/g' /home/ubuntu/insecure-python-microservice/frontend/k8s/service.yaml
 aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-3*' --query "Reservations[].Instances[].PrivateIpAddress" --output text --region us-west-2  | xargs -I {} sed -i -e 's/Worker-3/{}/g' /home/ubuntu/insecure-python-microservice/worker-3/k8-dashboard/k8s-dashboard.yaml
 aws ec2 describe-instances --filters 'Name=tag:Name,Values=Worker-1*' --query "Reservations[].Instances[].PrivateIpAddress" --output text --region us-west-2  | xargs -I {} sed -i -e 's/Worker-1/{}/g' /home/ubuntu/insecure-python-microservice/infrastructure/ansible/reverse-proxy.conf
 echo "starting master playbook"
 sudo ansible-playbook /home/ubuntu/insecure-python-microservice/infrastructure/ansible/master.yaml
 sleep 5
 echo "starting worker playbook"
-sudo ansible-playbook /home/ubuntu/insecure-python-microservice/infrastructure/ansible/worker.yml 
+sudo ansible-playbook /home/ubuntu/insecure-python-microservice/infrastructure/ansible/worker.yml
 EOF
 
   
