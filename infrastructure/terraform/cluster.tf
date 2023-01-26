@@ -255,6 +255,13 @@ resource "aws_security_group" "private_sg" {
     protocol = "tcp"
     security_groups = [aws_security_group.bastion_sg.id]
   }
+   ingress {
+    description = "Allow access via istio mesh"
+    from_port = 32634
+    to_port = 32634
+    protocol = "tcp"
+    security_groups = [aws_security_group.bastion_sg.id]
+  }
   egress {
     description = "Allow outbound"
     from_port = 0
