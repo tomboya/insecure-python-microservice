@@ -134,7 +134,7 @@ resource "aws_instance" "private_ec2_m" {
 }
 
 # Create the EC2-1 instance in the private subnet
-resource "aws_instance" "private_ec2_1" {
+resource "aws_instance" "worker" {
   count = 3
   ami = "ami-0135afc6d226a70a4"
   instance_type = "t2.medium"
@@ -446,22 +446,23 @@ output "private_ec2_private_ip_master" {
 }
 
 
+
+
+
 # Output the private-ec2-slave-1 host private IP address
 output "private_ec2_private_ip_slave1" {
-  value = aws_instance.private_ec2_1.private_ip
+  value = aws_instance.worker[0].private_ip
   description = "Private IP address of the Ec2 host"
 }
-
 
 # Output the private-ec2-slave-2 host private IP address
 output "private_ec2_private_ip_slave2" {
-  value = aws_instance.private_ec2_2.private_ip
+  value = aws_instance.worker[1].private_ip
   description = "Private IP address of the Ec2 host"
 }
-  
 
 # Output the private-ec2-slave-3 host private IP address
 output "private_ec2_private_ip_slave3" {
-  value = aws_instance.private_ec2_3.private_ip
+  value = aws_instance.worker[2].private_ip
   description = "Private IP address of the Ec2 host"
 }
