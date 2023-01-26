@@ -14,7 +14,7 @@ if ! terraform version > /dev/null ; then
   exit 1
 fi
 
-echo "# Verifying AWS Configuration in us-west-2"
+echo "# Verifying AWS Configuration in us-east-1"
 
 if ! aws configure list|grep -iq "ACCESS_KEY" ; then
   echo "AWS CLI is not configured. Exiting script."
