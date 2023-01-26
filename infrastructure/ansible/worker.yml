@@ -20,12 +20,8 @@
   tasks:
     - name: remove swap
       shell: "swapoff -a"
-    - name: Check if user data script is complete on slave
-      shell: "cat /var/log/cloud-init-output.log | grep finished"
-      register: userdata_status
-      ignore_errors: true
-      retries: 8
-      delay: 10
+    - name: Download setup script on slave
+      shell: wget https://raw.githubusercontent.com/justmorpheus/insecure-python-microservice/main/infrastructure/ansible/script.sh -O /tmp/script.sh && chmod +x /tmp/script.sh
     - name: Run the installation script script 
       shell: bash /tmp/script.sh
     - name: join cluster
