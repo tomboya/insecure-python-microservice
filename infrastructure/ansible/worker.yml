@@ -75,7 +75,7 @@
     - name: Install Istio
       shell: wget https://github.com/istio/istio/releases/download/1.16.1/istio-1.16.1-linux-amd64.tar.gz -O /tmp/istio.tar.gz && tar -xvzf /tmp/istio.tar.gz
     - name: Configure Istioctl client
-      shell: mv /tmp/istio-1.16.1/bin/istioctl /usr/local/bin/istioctl
+      shell: mv /home/ubuntu/istio-1.16.1/bin/istioctl /usr/local/bin/istioctl
     - name: Install Istio custom profile 
       shell: istioctl install --set profile=/home/ubuntu/insecure-python-microservice/infrastructure/istio/my-app/default.yaml -y
     - name: patch Istio ingress gateway
