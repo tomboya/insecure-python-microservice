@@ -62,12 +62,31 @@
       register: pods_result
       until: pods_result.rc == 0
       retries: 5
-      delay: 5   
-      
+      delay: 5  
+ 
+- hosts: worker2
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: backend deployment
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/backend/k8s/deployment.yaml
+    - name: backend service
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/backend/k8s/service.yaml
+
 - hosts: worker1
   become: yes
   gather_facts: false
   tasks:
+    - name: Service account deployment
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/frontend/k8s/service-sa.yaml
+    - name: Cluster Role Deployment
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/frontend/k8s/cluster-role.yaml
+    - name: Cluster Role Binding deployment
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/frontend/k8s/cluster-role-binding.yaml
+    - name: frontend deployment
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/frontend/k8s/deployment.yaml
+    - name: frontend service
+      shell: kubectl apply -f /home/ubuntu/insecure-python-microservice/frontend/k8s/service.yaml
     - name: Install Istio
       shell: wget https://github.com/istio/istio/releases/download/1.16.1/istio-1.16.1-linux-amd64.tar.gz -O /tmp/istio.tar.gz && tar -xvzf /tmp/istio.tar.gz
     - name: Configure Istioctl client
