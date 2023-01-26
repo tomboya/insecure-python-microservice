@@ -33,4 +33,4 @@ echo "##########################################################################
 echo "# Terraform destroy complete                                                  #"
 echo "###############################################################################"
 # exit the script with a proper status code
-exit 0
+#exit 0

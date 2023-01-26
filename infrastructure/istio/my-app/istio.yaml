@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: Namespace
+metadata:  
+  labels:
+    istio-injection: enabled
+  name: default 
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice1
+  labels:
+    app: microservice1
+    protected: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: microservice1
+  template:
+    metadata:
+      labels:
+        app: microservice1
+        protected: "true"
+    spec:
+      serviceAccountName: admin-sa
+      containers:
+      - name: microservice1
+        image: justmorpheu5/microservice1:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SECRET_KEY
+          value: Flag_3:{Flag_ThisIsFlag_3_0645372}
+        securityContext:
+          runAsUser: 1000
+          runAsNonRoot: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservice1
+  labels:
+    app: microservice1
+    protected: "true"
+spec:
+  type: NodePort
+  selector:
+    app: microservice1
+  ports:
+  - name: http-8080
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+    nodePort: 30001
+  externalIPs:
+  - 10.0.1.38
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice2
+  labels:
+    app: microservice2
+    protected: "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: microservice2
+  template:
+    metadata:
+      labels:
+        app: microservice2
+        protected: "true"
+    spec:
+      serviceAccountName: admin-sa
+      containers:
+      - name: microservice2
+        image: justmorpheu5/microservice2:latest
+        ports:
+        - containerPort: 5001
+        env:
+        - name: SECRET_KEY
+          value: secret
+        securityContext:
+          runAsUser: 1000
+          runAsNonRoot: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservice2
+  labels:
+    app: microservice2
+    protected: "true"
+spec:
+  type: NodePort
+  selector:
+    app: microservice2
+  ports:
+  - name: http-5001
+    protocol: TCP
+    port: 5001
+    targetPort: 5001
+    nodePort: 30002
+
+
