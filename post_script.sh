@@ -19,6 +19,7 @@ alias cd_temp="cd infrastructure/terraform"
 cd_temp
 
 # Run terraform destroy command
+echo "# Terraform destroy in progress"
 terraform destroy --auto-approve
 
 # Remove terraform related files and folders

@@ -28,6 +28,10 @@ spec:
         exact: /
     - uri:
         prefix: /encode
+    - uri:
+        prefix: /login
+    - uri:
+        prefix: /encservice
     route:
     - destination:
         host: microservice1.default.svc.cluster.local
