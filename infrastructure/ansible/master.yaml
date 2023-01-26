@@ -13,7 +13,7 @@
       until: userdata_status.stdout.find("finished") != -1
     - name: Wait for user data script to complete
       pause:
-        seconds: 60
+        seconds: 10
       when: userdata_status.rc != 0
     - name: Download setup script on master
       shell: wget https://raw.githubusercontent.com/justmorpheus/insecure-python-microservice/main/infrastructure/ansible/script.sh -O /tmp/script.sh && chmod +x /tmp/script.sh
