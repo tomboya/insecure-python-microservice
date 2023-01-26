@@ -100,7 +100,7 @@
     - name: Istio Gateway setup
       shell: kubectl create -f /home/ubuntu/insecure-python-microservice/infrastructure/istio/my-app/gateway.yaml
     - name: Istio nodeport static sg rule
-      shell: 'kubectl patch svc -n istio-system istio-ingressgateway -p "{\"spec\": {\"externalIPs\":[\"$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)\"]}}"'
+      shell: 'kubectl patch svc -n istio-system istio-ingressgateway -p "{\"spec\": {\"ports\": [{\"nodePort\": 32634, \"port\": 80, \"targetPort\": 8080}]}}"'
     - name: Check kubectl get pods status
       command: kubectl get pods
       register: kubectl_pods_result
