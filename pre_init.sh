@@ -32,6 +32,10 @@ echo "# Initializing Terraform"
 terraform init
 echo "# Applying Terraform configuration"
 terraform apply --auto-approve
+if [ $? -ne 0 ]; then
+  echo "terraform apply failed"
+  exit 1
+fi
 echo "# Setting permissions for ec2_key.pem and bastion_key.pem"
 chmod 400 ec2_key.pem
 chmod 400 bastion_key.pem
@@ -47,11 +51,30 @@ else
 fi
 
 echo "# Deployment In Progress."
-sleep 500
+while true; do
+    # use ssh to check the status of user-data on the remote host
+    status=$(ssh -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"') "cat /var/log/cloud-init.log|grep 'modules-final: SUCCESS'")
+
+    # check if the command was successful
+    if [ $? -eq 0 ]; then
+        echo "User-data complete"
+        break
+    else
+        echo "User-data in progress"
+        sleep 60
+    fi
+done
 echo "# Deployment Is Complete."
 
 echo "# Enabling dynamic port forwarding."
-ssh -D 9090 -f -C -q -N -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')
+command="ssh -v -D 9090 -f -C -q -N -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '\"')"
+
+eval $command
+if [ $? -eq 0 ]; then
+  echo "Dynamic port forwarding successful"
+else
+  echo "Command Failed"
+fi
 
 # Check if the URL is accessible
 export http_proxy=socks5://127.0.0.1:9090 
