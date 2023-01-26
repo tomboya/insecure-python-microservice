@@ -121,12 +121,6 @@ resource "aws_instance" "private_ec2_m" {
   key_name = aws_key_pair.ec2_key_pair.key_name
   vpc_security_group_ids = [aws_security_group.private_sg.id]
   subnet_id = aws_subnet.private_subnet.id
-  # Install and start the Kubeadm
-  user_data = <<EOF
-#!/bin/bash
-wget https://raw.githubusercontent.com/justmorpheus/insecure-python-microservice/main/infrastructure/ansible/script.sh -O /tmp/script.sh
-chmod +x /tmp/script.sh
-EOF
   root_block_device {
     volume_size   = "20"
 
@@ -146,13 +140,6 @@ resource "aws_instance" "private_ec2_1" {
   key_name = aws_key_pair.ec2_key_pair.key_name
   vpc_security_group_ids = [aws_security_group.private_sg.id]
   subnet_id = aws_subnet.private_subnet.id
-  # Install and start the Kubeadm
-  user_data = <<EOF
-#!/bin/bash
-wget https://raw.githubusercontent.com/justmorpheus/insecure-python-microservice/main/infrastructure/ansible/script.sh -O /tmp/script.sh
-chmod +x /tmp/script.sh
-EOF
-
   root_block_device {
     volume_size   = "20"
 
@@ -173,13 +160,6 @@ resource "aws_instance" "private_ec2_2" {
   key_name = aws_key_pair.ec2_key_pair.key_name
   vpc_security_group_ids = [aws_security_group.private_sg.id]
   subnet_id = aws_subnet.private_subnet.id
-  # Install and start the Kubeadm
-  user_data = <<EOF
-#!/bin/bash
-wget https://raw.githubusercontent.com/justmorpheus/insecure-python-microservice/main/infrastructure/ansible/script.sh -O /tmp/script.sh
-chmod +x /tmp/script.sh
-EOF
-  
   root_block_device {
     volume_size   = "20"
 
@@ -200,13 +180,6 @@ resource "aws_instance" "private_ec2_3" {
   key_name = aws_key_pair.ec2_key_pair.key_name
   vpc_security_group_ids = [aws_security_group.private_sg.id]
   subnet_id = aws_subnet.private_subnet.id
-  # Install and start the Kubeadm
-  user_data = <<EOF
-#!/bin/bash
-wget https://raw.githubusercontent.com/justmorpheus/insecure-python-microservice/main/infrastructure/ansible/script.sh -O /tmp/script.sh
-chmod +x /tmp/script.sh
-EOF
-  
   root_block_device {
     volume_size   = "20"
 
