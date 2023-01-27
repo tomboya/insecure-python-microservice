@@ -133,7 +133,7 @@ if [ $status_code -eq 200 ]; then
   echo "# URL is accessible"
 else
   echo "# URL is not accessible, re-running SSH command for port forwarding"
-  ssh -D 9090 -f -C -q -N -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$BASTION_HOST_IP
+  autossh -f -M 0 -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -D 9090 -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$BASTION_HOST_IP
 fi
 echo "###############################################################################"
 echo "# SOCKS proxy has been enabled on the CLI"
