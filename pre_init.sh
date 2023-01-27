@@ -101,6 +101,7 @@ echo "# SOCKS proxy has been enabled on the CLI"
 echo "# Enable socks proxy in the browser and forward to localhost:9090."
 echo "# Access Web Application Locally: http://$(terraform output private_ec2_private_ip_slave1 | tr -d '"'):32634"
 echo "# Access kubernetes Dashboard Locally: http://$(terraform output private_ec2_private_ip_slave1 | tr -d '"'):30033"
+echo "# Access Kiali Dashboard Locally: http://$(terraform output private_ec2_private_ip_slave1 | tr -d '"'):20001"
 echo "# Run command terraform folder to enabled dynamic port forwarding to access application locally: ssh -D 9090 -f -C -q -N -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')"
 # Check if ngrok is running
 result=$(ssh -o ProxyCommand="ssh -i bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "ps aux | grep -E 'ngrok http localhost:7777' | grep -v grep")
@@ -118,6 +119,24 @@ else
   # Get the ngrok URL
   url=$(ssh -o ProxyCommand="ssh -i bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "curl --silent http://localhost:4040/api/tunnels|jq '.tunnels[0].public_url'" | tr -d '"')
   echo "# Globally Access Application via: $url/webui"
+fi
+
+#check kiali
+result=$(ssh -o ProxyCommand="ssh -i bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "ps aux | grep -E 'istioctl dashboard kiali' | grep -v grep")
+if [[ ! -z "$result" ]]; then
+  # Get the kiali URL
+  url=$(ssh -o ProxyCommand="ssh -i bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "curl --silent http://localhost:4040/api/tunnels|jq '.tunnels[0].public_url'" | tr -d '"')
+  echo "# Access Kiali Dasboard via: $url/kiali"
+else
+  # Start kiali and wait for it to start
+  ssh -o ProxyCommand="ssh -i bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "nohup istioctl dashboard kiali --address 0.0.0.0 &"
+  while [[ -z "$result" ]]; do
+    result=$(ssh -o ProxyCommand="ssh -i bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "ps aux | grep -E 'istioctl dashboard kiali' | grep -v grep")
+    sleep 1
+  done
+  # Get the kiali URL
+  url=$(ssh -o ProxyCommand="ssh -i bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "curl --silent http://localhost:4040/api/tunnels|jq '.tunnels[0].public_url'" | tr -d '"')
+  echo "# Access Kiali Dasboard via: $url/kiali"
 fi
 echo "###############################################################################"
 
