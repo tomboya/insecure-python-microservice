@@ -8,4 +8,16 @@ cp /home/ubuntu/insecure-python-microservice/infrastructure/ansible/reverse-prox
 ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enabled/reverse-proxy.conf
 service nginx restart
 sleep 1;
-nohup ngrok http localhost:7777 --log=stdout > /dev/null 2>&1 &
+while true;
+do
+    nohup ngrok http localhost:7777 --log=stdout > /dev/null 2>&1 &
+    if ps -auxwww | grep -q ngrok; then
+        echo "ngrok successfully started"
+        sleep 2;
+	echo "URL: $(curl -s localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url')"
+        break
+    else
+        echo "Retrying ngrok start..."
+        sleep 5
+    fi
+done
