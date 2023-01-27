@@ -21,3 +21,17 @@ do
         sleep 5
     fi
 done
+
+while true;
+do
+    nohup istioctl dashboard kiali --address 0.0.0.0 &
+    if ps -auxwww | grep -q ngrok; then
+        echo "kiali successfully started"
+        sleep 2;
+	echo "Success with kiali"
+        break
+    else
+        echo "Retrying kiali start..."
+        sleep 5
+    fi
+done
