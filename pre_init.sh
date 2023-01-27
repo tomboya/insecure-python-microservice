@@ -57,10 +57,10 @@ while true; do
 
     # check if the command was successful
     if [ $? -eq 0 ]; then
-        echo "User-data complete"
+        echo "# User-data complete"
         break
     else
-        echo "User-data in progress"
+        echo "# User-data in progress"
         sleep 60
     fi
 done
@@ -71,9 +71,9 @@ command="ssh -v -D 9090 -f -C -q -N -i bastion_key.pem -o StrictHostKeyChecking=
 
 eval $command
 if [ $? -eq 0 ]; then
-  echo "Dynamic port forwarding successful"
+  echo "# Dynamic port forwarding successful"
 else
-  echo "Command Failed"
+  echo "# Command Failed"
 fi
 
 # Check if the URL is accessible
@@ -101,7 +101,7 @@ echo "##########################################################################
 
 alias cd_back="cd ../../"
 cd_back
-echo "To Destroy Lab, run: source post_scrit.sh"
+echo "# To Destroy Lab, run: source post_scrit.sh"
 
-echo "Script execution complete."
+echo "# Script execution complete."
 
