@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 echo "###############################################################################"
 echo "#                           KubeKrack                                         #"
 echo "#                 A Vulnerable Kubernetes Lab                                 #"
@@ -14,6 +15,39 @@ if [[ $(git rev-parse HEAD) != $(git ls-remote $(git rev-parse --abbrev-ref @{u}
   sed 's/\// /g') | cut -f1) ]]; then
   git pull
 fi
+
+
+echo "# Installing autossh dependency"
+OS="$(uname)"
+# Check if autossh is already installed
+if command -v autossh >/dev/null 2>&1 ; then
+  echo "# autossh is already installed. Skipping autossh installation."
+else
+  # Determines the operating system.
+
+  if [ "${OS}" = "Darwin" ] ; then
+    OSEXT="osx"
+    echo "# autossh installation in progress"
+    brew install autossh
+  elif grep -q "Amazon" /etc/os-release; then
+    echo "# autossh installation in progress for Amazon Linux"
+    sudo yum update -y
+    sudo amazon-linux-extras install epel -y
+    sudo yum install autossh -y
+  elif grep -q "Ubuntu" /etc/os-release; then
+    echo "# autossh installation in progress for Ubuntu"
+    sudo apt-get update
+    sudo apt-get install -y autossh
+  elif grep -q "CentOS" /etc/os-release; then
+    echo "# autossh installation in progress for Centos"
+    sudo yum update -y
+    sudo yum install -y autossh
+  else
+    echo "# Unable to determine the operating system. Install autossh manually."
+    exit 1
+  fi
+fi
+
 
 echo "# Starting script execution"
 echo "# Verifying Terraform Installation"
