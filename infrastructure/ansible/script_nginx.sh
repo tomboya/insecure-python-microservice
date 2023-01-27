@@ -11,7 +11,7 @@ sleep 1;
 while true;
 do
     nohup ngrok http localhost:7777 --log=stdout > /dev/null 2>&1 &
-    if ps -auxwww | grep -q ngrok; then
+    if ps -auxwww | grep ngrok |grep -v grep; then
         echo "ngrok successfully started"
         sleep 2;
 	echo "URL: $(curl -s localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url')"
@@ -25,7 +25,7 @@ done
 while true;
 do
     nohup istioctl dashboard kiali --address 0.0.0.0 &
-    if ps -auxwww | grep -q ngrok; then
+    if ps -auxwww | grep kiali |grep -v grep; then
         echo "kiali successfully started"
         sleep 2;
 	echo "Success with kiali"
