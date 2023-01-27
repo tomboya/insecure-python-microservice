@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 echo "###############################################################################"
 echo "#                           KubeKrack                                         #"
 echo "#                 A Vulnerable Kubernetes Lab                                 #"
@@ -8,10 +9,7 @@ echo "##########################################################################
 
 echo "###############################################################################"
 
-# Check if git repository is up to date
-echo "# Script Execution Started"
-
-
+echo "Starting Setup"
 echo "# Installing autossh dependency"
 OS="$(uname)"
 # Check if autossh is already installed
@@ -70,7 +68,10 @@ echo "# Initializing Terraform"
 terraform init
 echo "# Applying Terraform configuration"
 terraform apply --auto-approve
-
+if [ $? -ne 0 ]; then
+  echo "terraform apply failed"
+  exit 1
+fi
 echo "# Setting permissions for ec2_key.pem and bastion_key.pem"
 chmod 400 ec2_key.pem
 chmod 400 bastion_key.pem
@@ -79,7 +80,7 @@ BASTION_HOST_IP=$(terraform output bastion_host_public_ip | tr -d '"')
 SLAVE_1=$(terraform output private_ec2_private_ip_slave1 | tr -d '"')
 
 echo "# Copying ssh keys to remote server"
-scp -o StrictHostKeyChecking=no -i bastion_key.pem ec2_key.pem ubuntu@$BASTION_HOST_IP:~/
+scp -o StrictHostKeyChecking=no -i bastion_key.pem ec2_key.pem ubuntu@$(terraform output bastion_host_public_ip | tr -d '"'):~/
 # Check if the key file exists on the server
 if ssh -o StrictHostKeyChecking=no -i bastion_key.pem ubuntu@$BASTION_HOST_IP "ls /home/ubuntu/ec2_key.pem" ; then
   echo "Ssh Key file already exists on the server"
