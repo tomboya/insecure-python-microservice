@@ -20,7 +20,7 @@ cd_temp
 
 # Run terraform destroy command
 echo "# Terraform destroy in progress"
-terraform destroy --auto-approve
+terraform destroy --auto-approve -lock=false
 
 # Remove terraform related files and folders
 rm -rf .terraform*
