@@ -82,7 +82,7 @@ BASTION_HOST_IP=$(terraform output bastion_host_public_ip | tr -d '"')
 SLAVE_1=$(terraform output private_ec2_private_ip_slave1 | tr -d '"')
 
 echo "# Copying ssh keys to remote server"
-scp -o StrictHostKeyChecking=no -i bastion_key.pem ec2_key.pem ubuntu@$(terraform output bastion_host_public_ip | tr -d '"'):~/
+scp -o StrictHostKeyChecking=no -i bastion_key.pem ec2_key.pem ubuntu@$BASTION_HOST_IP:~/
 # Check if the key file exists on the server
 if ssh -o StrictHostKeyChecking=no -i bastion_key.pem ubuntu@$BASTION_HOST_IP "ls /home/ubuntu/ec2_key.pem" ; then
   echo "Ssh Key file already exists on the server"
