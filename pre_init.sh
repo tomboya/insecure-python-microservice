@@ -8,6 +8,14 @@ echo "##########################################################################
 
 echo "###############################################################################"
 
+# Check if git repository is up to date
+echo "# Verifying Latest Updates"
+if [[ $(git rev-parse HEAD) != $(git ls-remote $(git rev-parse --abbrev-ref @{u} | \
+  sed 's/\// /g') | cut -f1) ]]; then
+  git pull
+fi
+
+echo "# Starting script execution"
 echo "# Verifying Terraform Installation"
 if ! terraform version > /dev/null ; then
   echo "Terraform is not installed. Exiting script."
