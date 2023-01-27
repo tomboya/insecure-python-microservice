@@ -73,10 +73,7 @@ echo "# Initializing Terraform"
 terraform init
 echo "# Applying Terraform configuration"
 terraform apply --auto-approve
-if [ $? -ne 0 ]; then
-  echo "terraform apply failed"
-  exit 1
-fi
+
 echo "# Setting permissions for ec2_key.pem and bastion_key.pem"
 chmod 400 ec2_key.pem
 chmod 400 bastion_key.pem
