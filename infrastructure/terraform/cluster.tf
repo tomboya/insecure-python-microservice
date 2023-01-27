@@ -196,6 +196,13 @@ resource "aws_security_group" "private_sg" {
     protocol = "tcp"
     security_groups = [aws_security_group.bastion_sg.id]
   }
+   ingress {
+    description = "Allow kiali access"
+    from_port = 20001
+    to_port = 20001
+    protocol = "tcp"
+    security_groups = [aws_security_group.bastion_sg.id]
+  }
   egress {
     description = "Allow outbound"
     from_port = 0
