@@ -108,7 +108,7 @@
       retries: 5
       delay: 5
     - name: Configure Kiali Dashboard
-      shell: kubectl apply -f /home/ubuntu/istio-1.16.1/samples/addons/kiali.yaml
+      shell: kubectl apply -f /home/ubuntu/istio-1.16.1/samples/addons/
  
 - hosts: worker3
   become: yes
