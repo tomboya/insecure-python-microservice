@@ -1,4 +1,5 @@
 #!/bin/bash
+set +e
 echo "###############################################################################"
 echo "#                           KubeKrack                                         #"
 echo "#                 A Vulnerable Kubernetes Lab                                 #"
