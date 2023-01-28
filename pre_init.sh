@@ -85,7 +85,7 @@ fi
 echo "# Deployment In Progress."
 while true; do
     # use ssh to check the status of user-data on the remote host
-    status=$(ssh -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$BASTION_HOST_IP "cat /var/log/cloud-init.log|grep 'modules-final: SUCCESS'")
+    status=$(ssh -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"') "cat /var/log/cloud-init.log|grep 'modules-final: SUCCESS'")
 
     # check if the command was successful
     if [ $? -eq 0 ]; then
