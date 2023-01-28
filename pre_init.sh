@@ -83,19 +83,16 @@ else
 fi
 
 echo "# Deployment In Progress."
-while true; do
-    # use ssh to check the status of user-data on the remote host
-    status=$(ssh -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"') "cat /var/log/cloud-init.log|grep 'modules-final: SUCCESS'")
-
-    # check if the command was successful
-    if [ $? -eq 0 ]; then
-        echo "# User-data complete"
-        break
-    else
-        echo "# User-data in progress"
-        sleep 60
-    fi
-done
+status=$(ssh -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"') "cat /var/log/cloud-init-output.log | grep -E 'modules:final'")
+if [[ ! -z "$status" ]]; then
+    echo "# User-data script complete."
+else
+    status=$(ssh -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"') "cat /var/log/cloud-init-output.log | grep -E 'modules:final'")
+    while [[ -z "$status" ]]; do
+    echo "# User-data in progress." 
+    sleep 60
+    done
+fi
 echo "# Deployment Is Complete."
 
 echo "# Enabling dynamic port forwarding."
