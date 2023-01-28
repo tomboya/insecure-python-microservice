@@ -88,10 +88,8 @@ status=$(ssh -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform o
 if [[ ! -z "$status" ]]; then
     echo "# User-data script complete."
 else
-    echo "breakpoint-1"
     echo "$status"
     while [[ -z "$status" ]]; do
-    echo "breakpoint-2"
     echo "# User-data in progress." 
     sleep 60
     status=$(ssh -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"') "cat /var/log/cloud-init-output.log | grep -E 'modules:final'")
