@@ -43,7 +43,7 @@
     - name: install Pod network
       become: yes
       become_user: ubuntu
-      shell: kubectl apply -f https://raw.githubusercontent.com/cilium/cilium/v1.9.18/install/kubernetes/quick-install.yaml >> pod_network_setup.txt
+      shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/v0.20.2/Documentation/kube-flannel.yml
       args:
         chdir: $HOME
         creates: pod_network_setup.txt
