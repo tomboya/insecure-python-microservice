@@ -137,12 +137,12 @@ resource "aws_instance" "private_ec2_m" {
 resource "aws_instance" "worker" {
   count = 3
   ami = "ami-0e472ba40eb589f49"
-  instance_type = "t2.medium"
+  instance_type = "t2.large"
   key_name = aws_key_pair.ec2_key_pair.key_name
   vpc_security_group_ids = [aws_security_group.private_sg.id]
   subnet_id = aws_subnet.private_subnet.id
   root_block_device {
-    volume_size   = "20"
+    volume_size   = "30"
 
   }
 
