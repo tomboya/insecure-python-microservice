@@ -51,7 +51,7 @@ service:
   ## Default: nil
   ##
   externalIPs:
-  - Worker-2-IP
+  - Worker2-IP
   #
   ## LoadBalancer IP if service.type is LoadBalancer
   ## Default: nil
