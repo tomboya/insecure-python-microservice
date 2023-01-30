@@ -115,7 +115,7 @@
   gather_facts: false
   tasks:
     - name: Install helm
-      shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+      shell: chmod +x /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/helm3.sh && bash /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/helm3.sh
     - name: Add stable repo
       shell: helm repo add stable https://charts.helm.sh/stable
     - name: Logging Namespace
