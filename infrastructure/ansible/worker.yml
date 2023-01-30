@@ -170,7 +170,7 @@
     - name: Logging Namespace
       shell: kubectl create namespace logging
     - name: ES Install
-      shell: helm install elasticsearch stable/elasticsearch --namespace logging -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/es-values.yaml
+      shell: helm install elasticsearch stable/elasticsearch --namespace logging -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/es-values.yaml && sleep 1
     - name: Fluentd Install
       shell: helm install fluentd stable/fluentd-elasticsearch --namespace logging
     - name: Fluentd Install
@@ -179,7 +179,7 @@
       shell: kubectl -n logging get pods -n logging| grep -w 'Running' | wc -l
       register: pod_count
       until: pod_count.stdout == "8"
-      retries: 20
+      retries: 35
       delay: 15      
     - name: Falco Account Install
       shell: kubectl create -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-account.yaml
