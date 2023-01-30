@@ -176,7 +176,7 @@
     - name: Fluentd Install
       shell: sudo helm install kibana stable/kibana --namespace logging -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/kb-values.yaml 
     - name: Wait for all pods to be in running state
-      shell: kubectl -n logging get pods -n logging| grep -w "Running" | wc -l
+      shell: kubectl -n logging get pods -n logging| grep -w 'Running' | wc -l
       register: pod_count
       until: pod_count.stdout == "8"
       retries: 20
