@@ -127,6 +127,7 @@ client:
     #      - chart-example.local
 
 master:
+  nodeName: Worker-2
   name: master
   exposeHttp: false
   replicas: 2
