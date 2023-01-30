@@ -166,6 +166,7 @@ else
   url=$(ssh -o ProxyCommand="ssh -i bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "curl --silent http://localhost:4040/api/tunnels|jq '.tunnels[0].public_url'" | tr -d '"')
   echo "# Access Kiali Dasboard via: $url/kiali"
 fi
+echo "# Access Falco-Kibana Dasboard via: $url/kibana"
 echo "###############################################################################"
 
 
