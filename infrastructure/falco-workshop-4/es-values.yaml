@@ -129,6 +129,7 @@ client:
 master:
   nodeName: Worker-2
   name: master
+  serviceType: ClusterIP
   exposeHttp: false
   replicas: 2
   heapSize: "512m"
