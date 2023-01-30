@@ -122,7 +122,8 @@ else
    #Additional Check for autossh
   autossh -f -M 0 -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -D 9090 -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')
 fi
-
+unset http_proxy
+unset https_proxy
 echo "###############################################################################"
 echo "# SOCKS proxy has been enabled on the CLI"
 echo "# Enable socks proxy in the browser and forward to localhost:9090."
