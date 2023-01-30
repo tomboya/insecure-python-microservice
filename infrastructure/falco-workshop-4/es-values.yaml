@@ -175,6 +175,7 @@ master:
     type: OnDelete
 
 data:
+  nodeName: Worker-2
   name: data
   exposeHttp: false
   replicas: 1
