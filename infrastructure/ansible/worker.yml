@@ -109,6 +109,41 @@
       delay: 5
     - name: Configure Kiali Dashboard
       shell: kubectl apply -f /home/ubuntu/istio-1.16.1/samples/addons/
+      
+- hosts: worker2
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Install helm
+      shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    - name: Add stable repo
+      shell: helm repo add stable https://charts.helm.sh/stable
+    - name: Logging Namespace
+      shell: kubectl create namespace logging
+    - name: ES Install
+      shell: helm install elasticsearch stable/elasticsearch --namespace logging -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/es-values.yaml && sleep 1
+    - name: Fluentd Install
+      shell: helm install fluentd stable/fluentd-elasticsearch --namespace logging
+    - name: Fluentd Install
+      shell: sudo helm install kibana stable/kibana --namespace logging -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/kb-values.yaml 
+    - name: Wait for all pods to be in running state
+      shell: kubectl -n logging get pods -n logging| grep -w 'Running' | wc -l
+      register: pod_count
+      until: pod_count.stdout == "8"
+      retries: 35
+      delay: 15      
+    - name: Falco Account Install
+      shell: kubectl create -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-account.yaml
+      when: pod_count.stdout == "8"
+    - name: Falco Service Install
+      shell: kubectl create -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-service.yaml
+    - name: Create Configmap
+      shell: kubectl create configmap falco-config --from-file=/home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-config
+    - name: Falco Daemonset
+      shell: kubectl create -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-daemonset-configmap.yaml
+    - name: Malicious Event Generator 
+      shell: kubectl create -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-event-generator-deployment.yaml && sleep 30 && kubectl delete -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-event-generator-deployment.yaml
+
  
 - hosts: worker3
   become: yes
@@ -159,39 +194,6 @@
       shell: kubectl create -f /home/ubuntu/insecure-python-microservice/kyverno/
       ignore_errors: true
       
-- hosts: worker2
-  become: yes
-  gather_facts: false
-  tasks:
-    - name: Install helm
-      shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-    - name: Add stable repo
-      shell: helm repo add stable https://charts.helm.sh/stable
-    - name: Logging Namespace
-      shell: kubectl create namespace logging
-    - name: ES Install
-      shell: helm install elasticsearch stable/elasticsearch --namespace logging -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/es-values.yaml && sleep 1
-    - name: Fluentd Install
-      shell: helm install fluentd stable/fluentd-elasticsearch --namespace logging
-    - name: Fluentd Install
-      shell: sudo helm install kibana stable/kibana --namespace logging -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/kb-values.yaml 
-    - name: Wait for all pods to be in running state
-      shell: kubectl -n logging get pods -n logging| grep -w 'Running' | wc -l
-      register: pod_count
-      until: pod_count.stdout == "8"
-      retries: 35
-      delay: 15      
-    - name: Falco Account Install
-      shell: kubectl create -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-account.yaml
-      when: pod_count.stdout == "8"
-    - name: Falco Service Install
-      shell: kubectl create -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-service.yaml
-    - name: Create Configmap
-      shell: kubectl create configmap falco-config --from-file=/home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-config
-    - name: Falco Daemonset
-      shell: kubectl create -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-daemonset-configmap.yaml
-    - name: Malicious Event Generator 
-      shell: kubectl create -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-event-generator-deployment.yaml && sleep 30 && kubectl delete -f /home/ubuntu/insecure-python-microservice/infrastructure/falco-workshop-4/falco-event-generator-deployment.yaml
       
 - hosts: worker1
   become: yes
