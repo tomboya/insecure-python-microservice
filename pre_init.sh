@@ -175,5 +175,4 @@ cd_back
 echo "# To Destroy Lab, run: source post_scrit.sh"
 
 echo "# Script execution complete."
-## Capture SIGINT (Ctrl-C) and exit the script clean.
-trap control_c SIGINT
+
