@@ -72,6 +72,7 @@ cluster:
     # - mapper-size
 
 client:
+  nodeName: Worker-2
   name: client
   replicas: 1
   serviceType: ClusterIP
