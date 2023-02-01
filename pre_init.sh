@@ -42,18 +42,15 @@ fi
 echo "# Starting script execution"
 echo "# Verifying Terraform Installation"
 if ! terraform version > /dev/null ; then
-  echo "Terraform is not installed. Exiting script."
-  exit 1
+  echo "Terraform is not installed."
 fi
 
 echo "# Verifying AWS Configuration in us-east-1"
 
 if ! aws configure list|grep -iq "ACCESS_KEY" ; then
-  echo "AWS CLI is not configured. Exiting script."
-  exit 1
+  echo "# AWS CLI is not configured. Script will fail."
 elif ! aws configure get region | grep -q "us-east-1" ; then
-  echo "AWS region is not set to us-west-2. Exiting script."
-  exit 1
+  echo "# Info: AWS region is not set to us-west-1."
 fi
 
 
@@ -66,7 +63,8 @@ terraform init
 echo "# Applying Terraform configuration"
 terraform apply --auto-approve
 if [ $? -ne 0 ]; then
-  echo "terraform apply failed"
+  echo "terraform apply failed."
+  sleep 50
   exit 1
 fi
 echo "# Setting permissions for ec2_key.pem and bastion_key.pem"
