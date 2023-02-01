@@ -78,7 +78,7 @@ if ssh -o StrictHostKeyChecking=no -i *bastion_key.pem ubuntu@$(terraform output
   echo "Ssh Key file already exists on the server"
 else
   echo "Key file not found on the server, copying now"
-  scp -o StrictHostKeyChecking=no -i *bastion_key.pem ec2_key.pem ubuntu@$(terraform output bastion_host_public_ip | tr -d '"'):~/
+  scp -o StrictHostKeyChecking=no -i *bastion_key.pem *ec2_key.pem ubuntu@$(terraform output bastion_host_public_ip | tr -d '"'):~/
 fi
 
 echo "# Deployment In Progress."
