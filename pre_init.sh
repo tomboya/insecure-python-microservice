@@ -67,12 +67,12 @@ if [ $? -ne 0 ]; then
   sleep 50
   exit 1
 fi
-echo "# Setting permissions for ec2_key.pem and bastion_key.pem"
+echo "# Setting permissions for *ec2_key.pem and *bastion_key.pem"
 chmod 400 *ec2_key.pem
 chmod 400 *bastion_key.pem
 
 echo "# Copying ssh keys to remote server"
-scp -o StrictHostKeyChecking=no -i *bastion_key.pem ec2_key.pem ubuntu@$(terraform output bastion_host_public_ip | tr -d '"'):~/
+scp -o StrictHostKeyChecking=no -i *bastion_key.pem *ec2_key.pem ubuntu@$(terraform output bastion_host_public_ip | tr -d '"'):~/
 # Check if the key file exists on the server
 if ssh -o StrictHostKeyChecking=no -i *bastion_key.pem ubuntu@$(terraform output bastion_host_public_ip | tr -d '"') "ls /home/ubuntu/ec2_key.pem" ; then
   echo "Ssh Key file already exists on the server"
