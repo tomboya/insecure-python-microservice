@@ -5,6 +5,8 @@ provider "aws" {
 
 resource "random_string" "example" {
   length = 5
+  lower = true
+  special = false
 }
 
 # Create the VPC
@@ -14,7 +16,7 @@ resource "aws_vpc" "my_vpc" {
   enable_dns_support = true
 
   tags = {
-    Name = "My VPC"
+    Name = "kubekrack-VPC-${random_string.example.result}"
   }
 }
 
@@ -105,11 +107,11 @@ resource "tls_private_key" "ec2_key_pair" {
 
 resource "local_file" "ec2_ssh_key" {
   content  = tls_private_key.ec2_key_pair.private_key_pem
-  filename = "ec2_key.pem"
+  filename = "${random_string.example.result}-ec2_key.pem"
 }
 
 resource "aws_key_pair" "ec2_key_pair" {
-  key_name   = "ec2_key"
+  key_name   = local_file.ec2_ssh_key.filename
   public_key = tls_private_key.ec2_key_pair.public_key_openssh
 }
 
@@ -157,7 +159,7 @@ resource "aws_instance" "worker" {
 
 # Create the security group for the Private host
 resource "aws_security_group" "private_sg" {
-  name = "private_sg"
+  name = "${random_string.example.result}-private_sg"
   description = "Security group for the Private host"
   vpc_id = aws_vpc.my_vpc.id
 
@@ -221,18 +223,18 @@ resource "tls_private_key" "bastion_key_pair" {
 
 resource "local_file" "bastion_ssh_key" {
   content  = tls_private_key.bastion_key_pair.private_key_pem
-  filename = "bastion_key.pem"
+  filename = "${random_string.example.result}-bastion_key.pem"
 }
 
 resource "aws_key_pair" "bastion_key_pair" {
-  key_name   = "bastion_key"
+  key_name   = local_file.bastion_ssh_key.filename
   public_key = tls_private_key.bastion_key_pair.public_key_openssh
 }
 
 #Create a policy
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy
 resource "aws_iam_policy" "ec2_policy" {
-  name        = "ec2_policy_k8slab"
+  name        = "ec2_policy_k8slab-${random_string.example.result}"
   path        = "/"
   description = "Policy to provide permission to EC2 Bastion host"
   # Terraform's "jsonencode" function converts a
@@ -253,7 +255,7 @@ resource "aws_iam_policy" "ec2_policy" {
 #Create a role
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role
 resource "aws_iam_role" "ec2_role" {
-  name = "ec2_role"
+  name = "ec2_role-${random_string.example.result}"
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
@@ -275,7 +277,7 @@ resource "aws_iam_role" "ec2_role" {
 #Attach role to policy
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy_attachment
 resource "aws_iam_policy_attachment" "ec2_policy_role" {
-  name       = "ec2_attachment"
+  name       = "ec2_attachment-${random_string.example.result}"
   roles      = [aws_iam_role.ec2_role.name]
   policy_arn = aws_iam_policy.ec2_policy.arn
 }
@@ -283,7 +285,7 @@ resource "aws_iam_policy_attachment" "ec2_policy_role" {
 #Attach role to an instance profile
 #https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile
 resource "aws_iam_instance_profile" "ec2_profile" {
-  name = "ec2_profile"
+  name = "ec2_profile-${random_string.example.result}"
   role = aws_iam_role.ec2_role.name
 }
 
@@ -357,7 +359,7 @@ EOF
 
 # Create the security group for the Bastion host
 resource "aws_security_group" "bastion_sg" {
-  name = "bastion_sg"
+  name = "bastion_sg-${random_string.example.result}"
   description = "Security group for the Bastion host"
   vpc_id = aws_vpc.my_vpc.id
 
@@ -382,7 +384,7 @@ resource "aws_internet_gateway" "public_igw" {
   vpc_id = aws_vpc.my_vpc.id
 
   tags = {
-    Name = "Public Internet Gateway"
+    Name = "public_igw_${random_string.example.result}"
   }
 }
 
@@ -396,7 +398,7 @@ resource "aws_route_table" "public_rt" {
   }
 
   tags = {
-    Name = "Public Route Table"
+    Name = "public_rt_${random_string.example.result}"
   }
 }
 
@@ -418,7 +420,7 @@ resource "aws_route_table" "private_rt" {
 }
 
   tags = {
-    Name = "Private Route Table"
+    Name = "private_rt_${random_string.example.result}"
   }
 }
 
