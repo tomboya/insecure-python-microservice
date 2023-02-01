@@ -139,7 +139,7 @@ else
   # Start ngrok and wait for it to start
   ssh -o ProxyCommand="ssh -i *bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i *ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "nohup ngrok http localhost:7777 --log=stdout > /dev/null 2>&1 &"
   while [[ -z "$result" ]]; do
-    result=$(ssh -o ProxyCommand="ssh -i bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i *ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "ps aux | grep -E 'ngrok http localhost:7777' | grep -v grep")
+    result=$(ssh -o ProxyCommand="ssh -i *bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i *ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "ps aux | grep -E 'ngrok http localhost:7777' | grep -v grep")
     sleep 1
   done
   # Get the ngrok URL
