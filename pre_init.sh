@@ -9,6 +9,17 @@ echo "##########################################################################
 
 echo "###############################################################################"
 
+echo "Have you updated the value in https://github.com/<username/>insecure-python-microservice/infrastructure/ansible/script_nginx.sh for 'ngrok config add-authtoken <ngrok>'? (y/n)"
+read -r answer
+
+if [[ "$answer" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    echo "Continuing with the script..."
+    # Add the rest of your script here
+else
+    echo "Please update the value and try again."
+    exit 1
+fi
+
 echo "# Starting script execution"
 echo "# Installing autossh dependency"
 OS="$(uname)"
