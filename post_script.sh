@@ -10,6 +10,16 @@ echo "#                  Thank you for using KubeKrack Lab                      
 echo "#                                                                             #"
 echo "###############################################################################"
 
+if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
+    echo "The script was sourced (ran via . post_script.sh or source ppost_script.sh)"
+    # Add the rest of your script here
+else
+    echo "The script was executed directly (ran via bash pre_init.sh)"
+    echo "Please run the script using 'source post_script.sh' or '. post_script.sh'"
+    exit 1
+fi
+
+
 # Disable the socks proxy
 unset http_proxy
 unset https_proxy
