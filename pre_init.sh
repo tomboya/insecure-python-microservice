@@ -72,6 +72,7 @@ if ! aws configure list|grep -iq "ACCESS_KEY" ; then
   exit 1
 elif ! aws configure get region | grep -q "us-east-1" ; then
   echo "# Info: AWS region is not set to us-east-1."
+  echo "# Info: Default region will be used as us-east-1."
 
 fi
 
