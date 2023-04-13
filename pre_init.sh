@@ -159,7 +159,7 @@ echo "# Enable socks proxy in the browser and forward to localhost:9090."
 echo "# Access Web Application Locally: http://$(terraform output private_ec2_private_ip_slave1 | tr -d '"'):32634"
 echo "# Access kubernetes Dashboard Locally: http://$(terraform output private_ec2_private_ip_slave1 | tr -d '"'):30033"
 echo "# Access Kiali Dashboard Locally: http://$(terraform output private_ec2_private_ip_slave1 | tr -d '"'):20001"
-echo "# Run command terraform folder to enabled dynamic port forwarding to access application locally: ssh -D 9090 -f -C -q -N -i bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')"
+echo "# Run command to enabled dynamic port forwarding to access application locally: ssh -D 9090 -f -C -q -N -i infrastructure/terraform/*bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')"
 # Check if ngrok is running
 result=$(ssh -o ProxyCommand="ssh -i *bastion_key.pem -W %h:%p -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"')" -o StrictHostKeyChecking=no -i *ec2_key.pem ubuntu@$(terraform output private_ec2_private_ip_slave1 | tr -d '"') "ps aux | grep -E 'ngrok http localhost:7777' | grep -v grep")
 if [[ ! -z "$result" ]]; then
