@@ -11,7 +11,7 @@ echo "#                                                                         
 echo "###############################################################################"
 
 if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
-    echo "The script was sourced (ran via . post_script.sh or source ppost_script.sh)"
+    echo "The script was sourced (ran via . post_script.sh or source post_script.sh)"
     # Add the rest of your script here
 else
     echo "The script was executed directly (ran via bash pre_init.sh)"
