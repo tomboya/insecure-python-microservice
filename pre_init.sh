@@ -88,7 +88,7 @@ terraform apply --auto-approve
 if [ $? -ne 0 ]; then
   echo "terraform apply failed."
   sleep 50
-  exit 1
+  exit 2
 fi
 echo "# Setting permissions for *ec2_key.pem and *bastion_key.pem"
 chmod 400 *ec2_key.pem
