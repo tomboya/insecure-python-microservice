@@ -93,7 +93,14 @@ fi
 echo "# Setting permissions for *ec2_key.pem and *bastion_key.pem"
 chmod 400 *ec2_key.pem
 chmod 400 *bastion_key.pem
-mv *ec2_key.pem ec2_key.pem
+
+for file in *ec2_key.pem; do
+    if [ "$file" != "ec2_key.pem" ]; then
+        mv "$file" ec2_key.pem
+        break
+    fi
+done
+
 
 echo "# Copying ssh keys to remote server"
 scp -o StrictHostKeyChecking=no -i *bastion_key.pem *ec2_key.pem ubuntu@$(terraform output bastion_host_public_ip | tr -d '"'):~/
