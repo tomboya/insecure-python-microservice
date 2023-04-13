@@ -112,7 +112,7 @@ if [[ ! -z "$status" ]]; then
 else
     echo "$status"
     while [[ -z "$status" ]]; do
-    echo "# User-data in progress." 
+    echo "# Setup via user-data in progress." 
     sleep 60
     status=$(ssh -i *bastion_key.pem -o StrictHostKeyChecking=no ubuntu@$(terraform output bastion_host_public_ip | tr -d '"') "cat /var/log/cloud-init-output.log | grep -E 'modules:final'")
     done
