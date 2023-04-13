@@ -49,8 +49,10 @@ echo "# Verifying AWS Configuration in us-east-1"
 
 if ! aws configure list|grep -iq "ACCESS_KEY" ; then
   echo "# AWS CLI is not configured. Script will fail."
+  exit 1
 elif ! aws configure get region | grep -q "us-east-1" ; then
-  echo "# Info: AWS region is not set to us-west-1."
+  echo "# Info: AWS region is not set to us-east-1."
+
 fi
 
 
