@@ -40,6 +40,8 @@ rm -rf terraform.tfstate*
 alias cd_temp="cd ../../"
 cd_temp
 
+rm infrastructure/terraform/*ec2_key.pem
+
 echo "###############################################################################"
 echo "# Terraform destroy complete                                                  #"
 echo "###############################################################################"
