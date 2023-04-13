@@ -9,6 +9,15 @@ echo "##########################################################################
 
 echo "###############################################################################"
 
+if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
+    echo "The script was sourced (ran via . pre_init.sh or source pre_init.sh)"
+    # Add the rest of your script here
+else
+    echo "The script was executed directly (ran via bash pre_init.sh)"
+    echo "Please run the script using 'source pre_init.sh' or '. pre_init.sh'"
+    exit 1
+fi
+
 echo "Have you updated the value in https://github.com/<username/>insecure-python-microservice/infrastructure/ansible/script_nginx.sh for 'ngrok config add-authtoken <ngrok>'? (y/n)"
 read -r answer
 
